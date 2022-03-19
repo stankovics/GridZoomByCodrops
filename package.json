@@ -1,0 +1,28 @@
+{
+  "name": "recreating-gridzoom-by-codrops",
+  "version": "1.0.0",
+  "description": "Used for learning purpose",
+  "main": "index.js",
+  "scripts": {
+    "start": "parcel src/index.html --open",
+    "build": "npm run clean && npm run build:parcel"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stankovics/GridZoomByCodrops.git"
+  },
+  "author": "Stefan S",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/stankovics/GridZoomByCodrops/issues"
+  },
+  "homepage": "https://github.com/stankovics/GridZoomByCodrops#readme",
+  "dependencies": {
+    "gsap": "^3.9.1",
+    "imagesloaded": "^5.0.0",
+    "split-type": "^0.2.5"
+  },
+  "devDependencies": {
+    "parcel": "^2.3.2"
+  }
+}
