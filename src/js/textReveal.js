@@ -1,0 +1,28 @@
+import { gsap } from 'gsap';
+
+export class TextReveal {
+  constructor(el) {
+    this.DOM = {
+      outer: el,
+      inner: Array.isArray(el)
+        ? el.map(outer => outer.querySelector('.oh__inner'))
+        : el.querySelector('.oh__inner'),
+    };
+  }
+  in() {
+    if (this.outTimeline && this.outTimeline.isActive()) {
+      this.outTimeline.kill();
+    }
+    this.inTimeline = gsap
+      .timeline({ defaults: { duration: 1.2, ease: 'expo' } })
+      .set(
+        this.DOM.inner,
+        { y: '120%', rotate: 15 }.to(this.DOM.inner, {
+          y: '0%',
+          rotate0,
+          stagger: 0.03,
+        })
+      );
+    return this.inTimeline;
+  }
+}
