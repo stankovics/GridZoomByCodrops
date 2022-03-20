@@ -1,6 +1,6 @@
 const imagesLoaded = require('imagesloaded');
 
-export const preloadImages = (selector = 'img') => {
+const preloadImages = (selector = 'img') => {
   return new Promise(resolve => {
     imagesLoaded(
       document.querySelectorAll(selector),
@@ -9,3 +9,9 @@ export const preloadImages = (selector = 'img') => {
     );
   });
 };
+
+const calcWinsize = () => {
+  return { width: window.innerWidth, height: window.innerHeight };
+};
+
+export { preloadImages, calcWinsize };

@@ -529,6 +529,8 @@ var parcelHelpers = require("@parcel/transformer-js/src/esmodule-helpers.js");
 parcelHelpers.defineInteropFlag(exports);
 parcelHelpers.export(exports, "preloadImages", ()=>preloadImages
 );
+parcelHelpers.export(exports, "calcWinsize", ()=>calcWinsize
+);
 const imagesLoaded = require('imagesloaded');
 const preloadImages = (selector = 'img')=>{
     return new Promise((resolve)=>{
@@ -536,6 +538,12 @@ const preloadImages = (selector = 'img')=>{
             background: true
         }, resolve);
     });
+};
+const calcWinsize = ()=>{
+    return {
+        width: window.innerWidth,
+        height: window.innerHeight
+    };
 };
 
 },{"imagesloaded":"aYzyZ","@parcel/transformer-js/src/esmodule-helpers.js":"gkKU3"}],"aYzyZ":[function(require,module,exports) {
