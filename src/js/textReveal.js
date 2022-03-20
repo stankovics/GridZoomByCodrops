@@ -13,16 +13,19 @@ export class TextReveal {
     if (this.outTimeline && this.outTimeline.isActive()) {
       this.outTimeline.kill();
     }
+
     this.inTimeline = gsap
       .timeline({ defaults: { duration: 1.2, ease: 'expo' } })
-      .set(
-        this.DOM.inner,
-        { y: '120%', rotate: 15 }.to(this.DOM.inner, {
-          y: '0%',
-          rotate0,
-          stagger: 0.03,
-        })
-      );
+      .set(this.DOM.inner, {
+        y: '120%',
+        rotate: 15,
+      })
+      .to(this.DOM.inner, {
+        y: '0%',
+        rotate: 0,
+        stagger: 0.03,
+      });
     return this.inTimeline;
   }
+  out() {}
 }
