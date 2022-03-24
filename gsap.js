@@ -312,3 +312,12 @@ tl.to('.green', { duration: 1, x: 200 })
 tl.to('.green', { duration: 1, x: 200 })
   .to('.orange', { duration: 1, x: 200, scale: 0.2 })
   .to('.grey', { duration: 1, x: 200, scale: 2, y: 20 });
+
+/** isActive()
+ *
+ * https://codepen.io/GreenSock/pen/Pwzomo
+ * /* from the API documentation
+
+isActive() indicates whether or not the animation is currently active (meaning the virtual playhead is actively moving across this instance's time span and it is not paused, nor are any of its ancestor timelines). So for example, if a tween is in the middle of tweening, it's active, but after it is finished (or before it begins), it is not active. If it is paused or if it is placed inside of a timeline that's paused (or if any of its ancestor timelines are paused), isActive() will return false. If the playhead is directly on top of the animation's start time (even if it hasn't rendered quite yet), that counts as "active".
+
+*/

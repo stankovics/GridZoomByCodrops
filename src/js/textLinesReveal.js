@@ -6,6 +6,7 @@ import { wrapLines } from './utils';
 import { gsap } from 'gsap';
 
 export class TextLinesReveal {
+  // animates div with class .content__item-text / whole text
   constructor(animationElems) {
     this.DOM = {
       animationElems: Array.isArray(animationElems)
@@ -21,7 +22,7 @@ export class TextLinesReveal {
       const SplitTypeInstance = new SplitType(el, { types: 'lines' });
       // wrap the lines (div with class .oh)
       // the inner child will be the one animating the transform
-      wrapLines(SplitTypeInstance.lines, 'div', 'oh');
+      wrapLines(SplitTypeInstance.lines, 'div', 'oh'); // 1. creates new div, 2. adds to div class of '.oh', 3. append created div as last child of lines parent element, 4. append each word as last child in new div with class of .oh
       this.lines.push(SplitTypeInstance.lines);
       // keep a reference to the SplitType instance
       this.SplitTypeInstances.push(SplitTypeInstance);

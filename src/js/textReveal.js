@@ -1,3 +1,4 @@
+// animates elements with .oh class / each word
 import { gsap } from 'gsap';
 
 export class TextReveal {
@@ -14,7 +15,7 @@ export class TextReveal {
       this.outTimeline.kill();
     }
 
-    this.inTimeline = gsap
+    this.inTimeline = gsap // text coming in y:120%
       .timeline({ defaults: { duration: 1.2, ease: 'expo' } })
       .set(this.DOM.inner, {
         y: '120%',
@@ -28,6 +29,7 @@ export class TextReveal {
     return this.inTimeline;
   }
   out() {
+    // text is going up y:-120%
     if (this.inTimeline && this.inTimeline.isActive()) {
       this.inTimeline.kill();
     }
