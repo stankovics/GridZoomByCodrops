@@ -10,9 +10,9 @@ export class ContentItem {
     // Main element .content__item
     el: null,
   };
-  // TextReveal obj to animate the texts (slide in/out)
+  // TextReveal obj to animate the texts/ each word (slide in/out)
   textReveal = null;
-  // TextLinesReveal obj to animate the ,ulti line texts (slide in/out)
+  // TextLinesReveal obj to animate the ,ulti line texts/ all text (slide in/out)
   textLinesReveal = null;
   /**
    * Constructor.
