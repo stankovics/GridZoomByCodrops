@@ -49,7 +49,23 @@ export class Grid {
   textReveal = null;
   /**
    * Constructor.
-   * @param {Element} DOM_el - the .grid--large element
+   * @param {Element} DOM_el - the .grid--large element -> main grid
    */
-  constructor(DOM_el) {}
+  constructor(DOM_el) {
+    this.DOM.el = DOM_el;
+    this.DOM.imageCells = [...this.DOM.el.querySelectorAll('.grid__cell-img')];
+    this.DOM.imageCells.forEach(el =>
+      this.imageCellArr.push(new ImageCell(el))
+    );
+    this.DOM.content = document.querySelector('.content');
+    this.DOM.backCtrl = this.DOM.content.querySelector('.back');
+    this.DOM.miniGrid.el = this.DOM.content.querySelector('.grid-mini');
+    this.DOM.miniGrid.cells = this.DOM.content.querySelectorAll('.grid__cell');
+    // Text animations
+    this.textReveal = new TextReveal([...this.DOM.el.querySelectorAll('.oh')]);
+    // Events
+    this.initEvents();
+    // Track wich cells are visible
+    // this.trackVisibleCells();
+  }
 }
