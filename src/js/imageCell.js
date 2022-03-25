@@ -6,9 +6,9 @@ import { ContentItem } from './contentitem';
 export class ImageCell {
   //DOM Elements
   DOM = {
-    //Main element (.grid__cell-img)
+    //Main element (.grid__cell-img) /  image container
     el: null,
-    // Inner element
+    // Inner element / pic inside image container/grid cell
     inner: null,
     // The ImageCell's content item id
     contentId: null,
