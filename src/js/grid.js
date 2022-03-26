@@ -68,4 +68,21 @@ export class Grid {
     // Track wich cells are visible
     // this.trackVisibleCells();
   }
+  /**
+   * Track which cells are visible (inside the viewport)
+   * by adding /removing the 'in-view' class when scrolling.
+   * This will be used to animate only the ones that are visible.
+   */
+  trackVisibleCells() {
+    const observer = new IntersectionObserver((entries, observer) => {
+      entries.forEach(entry => {
+        if (entry.intersectionRatio > 0) {
+          entry.target.classList.add('in-view');
+        } else {
+          entry.target.classList.remove('in-view');
+        }
+      });
+    });
+    this.DOM.imageCells.forEach(img => observer.observe(img));
+  }
 }
