@@ -159,6 +159,18 @@ export class Grid {
       });
     });
     // Recalculate current image transform
+    window.addEventListener('resize', () => {
+      if (this.isGridView) {
+        return false;
+      }
+      // Calculate the transform to apply to the image cell
+      const imageTransform = this.calcTransformImage();
+      gsap.set(this.imageCellArr[this.currentCell].DOM.el, {
+        scale: imageTransform.scale,
+        x: imageTransform.x,
+        y: imageTransform.y,
+      });
+    });
   }
   /**
    * Scale up the image and reveal its content.
