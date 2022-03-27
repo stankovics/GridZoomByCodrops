@@ -121,6 +121,22 @@ export class Grid {
 
         this.showContent(imageCell);
       });
+      // Hover on the image cell will scale down the outer element and scale up the inner element.
+      imageCell.DOM.el.addEventListener('mouseenter', () => {
+        if (!this.isGridView) {
+          return false;
+        }
+        gsap.killTweensOf([imageCell.DOM.el, imageCell.DOM.inner]);
+        gsap
+          .timeline({
+            defaults: {
+              duration: 2.4,
+              ease: 'expo',
+            },
+          })
+          .to(imageCell.DOM.el, { scale: 0.95 }, 0)
+          .to(imageCell.DOM.inner, { scale: 1.4 }, 0);
+      });
     }
   }
   /**
@@ -224,7 +240,16 @@ export class Grid {
         },
         'showContent+=0.2'
       )
-      .add();
+      .add(() => {
+        imageCell.contentItem.textReveal.in();
+        imageCell.contentItem.textLinesReveal.in();
+        this.DOM.content.classList.add('content--open');
+      }, 'showContent')
+      .add(
+        () =>
+          imageCell.contentItem.DOM.el.classList.add('content__item--curent'),
+        'showContent+=0.02'
+      );
   }
 
   /**
