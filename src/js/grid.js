@@ -72,6 +72,10 @@ export class Grid {
    * Track which cells are visible (inside the viewport)
    * by adding /removing the 'in-view' class when scrolling.
    * This will be used to animate only the ones that are visible.
+   *
+   * entries is an array of objects and each object inside of it contains intersection data for target element.
+   * intersectionRatio property tells you how much of the target element is currently visible within the root's intersection ratio, as a value between 0.0 and 1.0.
+   *
    */
   trackVisibleCells() {
     const observer = new IntersectionObserver((entries, observer) => {
@@ -84,5 +88,158 @@ export class Grid {
       });
     });
     this.DOM.imageCells.forEach(img => observer.observe(img));
+  }
+
+  /**
+   * Init/Bind events.
+   */
+  initEvents() {
+    /** position, imageCell are matching key and value pairs that are returned by imageCellArr.entires() 
+      [0, "Banana"]
+      [1, "Orange"]
+     * */
+    for (const [position, imageCell] of this.imageCellArr.entries()) {
+      // Open the imageCell and reveal its content
+      imageCell.DOM.el.addEventListener('click', () => {
+        // creates click for each image on main grid
+        if (!this.isGridView || this.isAnimating) {
+          return false;
+        }
+        this.isAnimating = true;
+        this.isGridView = false;
+        // Update the mini grid current cell
+        if (this.currentCell !== -1) {
+          this.DOM.miniGrid.cells[this.currentCell].classList.remove(
+            'grid__cell--current'
+          );
+        }
+        // Update currentCell
+        this.currentCell = position; // currentCell get value from postion, that is a returned key from this.imageCellArr.entries() from top.
+        this.DOM.miniGrid.cells[this.currentCell].classList.add(
+          'grid__cell--current'
+        );
+
+        this.showContent(imageCell);
+      });
+    }
+  }
+  /**
+   * Scale up the image and reveal its content.
+   * @param {ImageCell} imageCell - the imageCell element.
+   */
+  showContent(imageCell) {
+    // Calculate the transform to apply to the image cell
+    const imageTransform = this.calcTransformImage();
+    // All the others (that are inside the viewport)
+    //this.otherImageCells = this.DOM.imageCells.filter(el => el != imageCell.DOM.el && el.classList.contains('in-view'));
+    this.otherImageCells = this.DOM.imageCells.filter(
+      el => el != imageCell.DOM.el
+    );
+
+    gsap.killTweensOf([
+      imageCell.DOM.el,
+      imageCell.DOM.inner,
+      this.otherImageCells,
+    ]);
+    gsap
+      .timeline({
+        defaults: {
+          duration: 1.2,
+          ease: 'expo.inOut',
+        },
+        //overflow hidden
+        onStart: () => bodyEl.classList.add('oh'),
+        onComplete: () => {
+          this.isAnimating = false;
+        },
+      })
+      .addLabel('start', 0)
+      .add(() => {
+        //hide grid texts
+        this.textReveal.out();
+      }, 'start')
+      .set(
+        this.DOM.el,
+        {
+          pointerEvents: 'none',
+        },
+        'start'
+      )
+      .set(imageCell.DOM.el, { zIndex: 100 }, 'start')
+      .set(
+        [imageCell.DOM.el, imageCell.DOM.inner, this.otherImageCells],
+        { willChange: 'transform, opacity' },
+        'start'
+      )
+      .to(imageCell.DOM.el, {
+        scale: imageTransform.scale,
+        x: imageTransform.x,
+        y: imageTransform.y,
+        onComplete: () =>
+          gsap.set(imageCell.DOM.el, { willChange: '' }, 'start'),
+      })
+      .to(
+        imageCell.DOM.inner,
+        {
+          scale: 1,
+          onComplete: () => gsap.set(imageCell.inner, { willChange: '' }),
+        },
+        'start'
+      )
+      .to(
+        this.otherImageCells,
+        {
+          opacity: 0,
+          scale: 0.8,
+          onComplete: () => gsap.set(this.otherImageCells, { willChange: '' }),
+          stagger: {
+            grid: auto,
+            amount: 0.17,
+            from: this.currentCell,
+          },
+        },
+        'start'
+      )
+      .addLabel('showContent', 'start+=0.45')
+      .to(
+        this.DOM.backCtrl,
+        { ease: 'expo', startAt: { x: '50%' }, x: '0%', opacity: 1 },
+        'showContent'
+      )
+      .set(this.DOM.miniGrid.el, { opacity: 1 }, 'showContent')
+      .set(this.DOM.miniGrid.cells, { opacity: 0 }, 'showContent')
+      .to(
+        this.DOM.miniGrid.cells,
+        {
+          duration: 1,
+          ease: 'expo',
+          opacity: 1,
+          startAt: { scale: 0.8 },
+          scale: 1,
+          stagger: {
+            grid: auto,
+            amount: 0.3,
+            from: this.currentCell,
+          },
+        },
+        'showContent+=0.2'
+      )
+      .add();
+  }
+
+  /**
+   * Calculates the scale and translation values to apply to the image cell when we click on it.
+   * Also used to recalculate those values on resize.
+   * @return {JSON} the translation and scale values
+   */
+  calcTransformImage() {
+    const cellrect = adjustedBoundingRect(
+      this.imageCellArr[this.currentCell].DOM.el
+    );
+    return {
+      scale: (winsize.width * 0.54) / cellrect.width,
+      x: winsize.width * 0.65 - (cellrect.left + cellrect.width / 2),
+      y: winsize.height * 0.5 - (cellrect.top + cellrect.height / 2),
+    };
   }
 }
