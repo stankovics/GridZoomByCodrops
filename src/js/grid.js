@@ -138,6 +138,27 @@ export class Grid {
           .to(imageCell.DOM.inner, { scale: 1.4 }, 0);
       });
     }
+
+    // Close the imageCell and reveal the grid
+    this.DOM.backCtrl.addEventListener('click', () => {
+      if (this.isAnimating) {
+        return false;
+      }
+      this.isAnimating = true;
+      this.isGridView = true;
+
+      this.closeContent();
+    });
+    this.DOM.miniGrid.cells.forEach((cell, position) => {
+      cell.addEventListener('click', () => {
+        if (this.isAnimating || this.currentCell === position) {
+          return false;
+        }
+        this.isAnimating = true;
+        this.changeContent(position);
+      });
+    });
+    // Recalculate current image transform
   }
   /**
    * Scale up the image and reveal its content.
