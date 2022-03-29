@@ -5,15 +5,16 @@ import { TextReveal } from './textReveal';
 import { TextLinesReveal } from './textLinesReveal';
 
 export class ContentItem {
-  // DOM Elements
+  // DOM elements
   DOM = {
-    // Main element .content__item
+    // Main element (.content__item)
     el: null,
   };
-  // TextReveal obj to animate the texts/ each word (slide in/out)
+  // TextReveal obj to animate the texts (slide in/out)
   textReveal = null;
-  // TextLinesReveal obj to animate the ,ulti line texts/ all text (slide in/out)
+  // TextLinesReveal obj to animate the ,ulti line texts (slide in/out)
   textLinesReveal = null;
+
   /**
    * Constructor.
    * @param {Element} DOM_el - the .content__item element.
@@ -25,11 +26,11 @@ export class ContentItem {
       next: this.DOM.el.querySelector('.slide-nav__img--next'),
     };
 
-    // Text Animations
+    // Text animations
     this.textReveal = new TextReveal([...this.DOM.el.querySelectorAll('.oh')]);
     // Text lines animations
     this.textLinesReveal = new TextLinesReveal(
-      this.DOM.el.querySelectorAll('.content__item-text')
+      this.DOM.el.querySelector('.content__item-text')
     );
   }
 }

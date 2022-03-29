@@ -59,14 +59,17 @@ export class Grid {
     );
     this.DOM.content = document.querySelector('.content');
     this.DOM.backCtrl = this.DOM.content.querySelector('.back');
-    this.DOM.miniGrid.el = this.DOM.content.querySelector('.grid-mini');
-    this.DOM.miniGrid.cells = this.DOM.content.querySelectorAll('.grid__cell');
+    this.DOM.miniGrid.el = this.DOM.content.querySelector('.grid--mini');
+    this.DOM.miniGrid.cells = [
+      ...this.DOM.miniGrid.el.querySelectorAll('.grid__cell'),
+    ];
+
     // Text animations
     this.textReveal = new TextReveal([...this.DOM.el.querySelectorAll('.oh')]);
     // Events
     this.initEvents();
-    // Track wich cells are visible
-    // this.trackVisibleCells();
+    // Track which cells are visible
+    //this.trackVisibleCells();
   }
   /**
    * Track which cells are visible (inside the viewport)
@@ -101,20 +104,21 @@ export class Grid {
     for (const [position, imageCell] of this.imageCellArr.entries()) {
       // Open the imageCell and reveal its content
       imageCell.DOM.el.addEventListener('click', () => {
-        // creates click for each image on main grid
         if (!this.isGridView || this.isAnimating) {
           return false;
         }
         this.isAnimating = true;
         this.isGridView = false;
+
         // Update the mini grid current cell
         if (this.currentCell !== -1) {
           this.DOM.miniGrid.cells[this.currentCell].classList.remove(
             'grid__cell--current'
           );
         }
+
         // Update currentCell
-        this.currentCell = position; // currentCell get value from postion, that is a returned key from this.imageCellArr.entries() from top.
+        this.currentCell = position;
         this.DOM.miniGrid.cells[this.currentCell].classList.add(
           'grid__cell--current'
         );
@@ -158,6 +162,7 @@ export class Grid {
 
       this.closeContent();
     });
+
     this.DOM.miniGrid.cells.forEach((cell, position) => {
       cell.addEventListener('click', () => {
         if (this.isAnimating || this.currentCell === position) {
@@ -167,11 +172,13 @@ export class Grid {
         this.changeContent(position);
       });
     });
+
     // Recalculate current image transform
     window.addEventListener('resize', () => {
       if (this.isGridView) {
         return false;
       }
+
       // Calculate the transform to apply to the image cell
       const imageTransform = this.calcTransformImage();
       gsap.set(this.imageCellArr[this.currentCell].DOM.el, {
@@ -202,103 +209,90 @@ export class Grid {
     // prettier-ignore
     gsap.timeline({
         defaults: {
-          duration: 1.2,
-          ease: 'expo.inOut',
+            duration: 1.2, 
+            ease: 'expo.inOut'
         },
-        //overflow hidden
+        // overflow hidden
         onStart: () => bodyEl.classList.add('oh'),
         onComplete: () => {
-          this.isAnimating = false;
-        },
-      })
-      .addLabel('start', 0)
-      .add(() => {
-        //hide grid texts
+            this.isAnimating = false;
+        }
+    })
+    .addLabel('start', 0)
+    .add(() => {
+        // Hide grid texts
         this.textReveal.out();
-      }, 'start')
-      .set(
-        this.DOM.el,
-        {
-          pointerEvents: 'none',
-        },
-        'start'
-      )
-      .set(imageCell.DOM.el, { zIndex: 100 }, 'start')
-      .set(
-        [imageCell.DOM.el, imageCell.DOM.inner, this.otherImageCells],
-        { willChange: 'transform, opacity' },
-        'start'
-      )
-      .to(imageCell.DOM.el, {
+    }, 'start')
+    .set(this.DOM.el, {
+        pointerEvents: 'none'
+    }, 'start')
+    .set(imageCell.DOM.el, {
+        zIndex: 100
+    }, 'start')
+    .set([imageCell.DOM.el, imageCell.DOM.inner, this.otherImageCells], {
+        willChange: 'transform, opacity'
+    }, 'start')
+    .to(imageCell.DOM.el, {
         scale: imageTransform.scale,
         x: imageTransform.x,
         y: imageTransform.y,
-        onComplete: () =>
-          gsap.set(imageCell.DOM.el, { willChange: '' }, 'start'),
-      })
-      .to(
-        imageCell.DOM.inner,
-        {
-          scale: 1,
-          onComplete: () => gsap.set(imageCell.inner, { willChange: '' }),
-        },
-        'start'
-      )
-      .to(
-        this.otherImageCells,
-        {
-          opacity: 0,
-          scale: 0.8,
-          onComplete: () => gsap.set(this.otherImageCells, { willChange: '' }),
-          stagger: {
-            grid: auto,
+        onComplete: () => gsap.set(imageCell.DOM.el, {willChange: ''})
+    }, 'start')
+    .to(imageCell.DOM.inner, {
+        scale: 1,
+        onComplete: () => gsap.set(imageCell.DOM.inner, {willChange: ''})
+    }, 'start')
+    .to([imageCell.contentItem.DOM.nav.prev, imageCell.contentItem.DOM.nav.next], {
+        y: 0
+    }, 'start')
+    .to(this.otherImageCells, {
+        opacity: 0,
+        scale: 0.8,
+        onComplete: () => gsap.set(this.otherImageCells, {willChange: ''}),
+        stagger: {
+            grid: 'auto',
             amount: 0.17,
-            from: this.currentCell,
-          },
-        },
-        'start'
-      )
-      .addLabel('showContent', 'start+=0.45')
-      .to(
-        this.DOM.backCtrl,
-        { ease: 'expo', startAt: { x: '50%' }, x: '0%', opacity: 1 },
-        'showContent'
-      )
-      .set(this.DOM.miniGrid.el, { opacity: 1 }, 'showContent')
-      .set(this.DOM.miniGrid.cells, { opacity: 0 }, 'showContent')
-      .to(
-        this.DOM.miniGrid.cells,
-        {
-          duration: 1,
-          ease: 'expo',
-          opacity: 1,
-          startAt: { scale: 0.8 },
-          scale: 1,
-          stagger: {
-            grid: auto,
+            from: this.currentCell
+        }
+    }, 'start')
+    .addLabel('showContent', 'start+=0.45')
+    .to(this.DOM.backCtrl, {
+        ease: 'expo',
+        startAt: {x: '50%'},
+        x: '0%',
+        opacity: 1
+    }, 'showContent')
+    .set(this.DOM.miniGrid.el, {
+        opacity: 1
+    }, 'showContent')
+    .set(this.DOM.miniGrid.cells, {
+        opacity: 0
+    }, 'showContent')
+    .to(this.DOM.miniGrid.cells, {
+        duration: 1, 
+        ease: 'expo',
+        opacity: 1,
+        startAt: {scale: 0.8},
+        scale: 1,
+        stagger: {
+            grid: 'auto',
             amount: 0.3,
-            from: this.currentCell,
-          },
-        },
-        'showContent+=0.2'
-      )
-      .add(() => {
+            from: this.currentCell
+        }
+    }, 'showContent+=0.2')
+    .add(() => {
         imageCell.contentItem.textReveal.in();
         imageCell.contentItem.textLinesReveal.in();
         this.DOM.content.classList.add('content--open');
-      }, 'showContent')
-      .add(
-        () =>
-          imageCell.contentItem.DOM.el.classList.add('content__item--curent'),
-        'showContent+=0.02'
-      );
+    }, 'showContent')
+    .add(() => imageCell.contentItem.DOM.el.classList.add('content__item--current'), 'showContent+=0.02');
   }
-  /**
-   * Scale down the image and reveal the grid again
 
+  /**
+   * Scale down the image and reveal the grid again.
    */
   closeContent() {
-    // Current image cell
+    // Current imageCell
     const imageCell = this.imageCellArr[this.currentCell];
     this.otherImageCells = this.DOM.imageCells.filter(
       el => el != imageCell.DOM.el
@@ -306,113 +300,85 @@ export class Grid {
     // prettier-ignore
     gsap.timeline({
         defaults: {
-          duration: 1,
-          ease: 'expo.inOut',
+            duration: 1, 
+            ease: 'expo.inOut'
         },
         // overflow hidden
         onStart: () => bodyEl.classList.remove('oh'),
         onComplete: () => {
-          this.isAnimating = false;
-        },
-      })
-      .addLabel('start', 0)
-      .to(
-        this.DOM.backCtrl,
-        {
-          x: '50%',
-          opacity: 0,
-        },
-        'start'
-      )
-      .to(
-        this.DOM.backCtrl,
-        {
-          duration: 0.5,
-          ease: 'expo.in',
-          opacity: 0,
-          scale: 0.8,
-          stagger: {
-            grid: auto,
+            this.isAnimating = false;
+        }
+    })
+    .addLabel('start', 0)
+    .to(this.DOM.backCtrl, {
+        x: '50%',
+        opacity: 0
+    }, 'start')
+    .to(this.DOM.miniGrid.cells, {
+        duration: 0.5, 
+        ease: 'expo.in',
+        opacity: 0,
+        scale: 0.8,
+        stagger: {
+            grid: 'auto',
             amount: 0.1,
-            from: -this.currentCell,
-          },
-          onComplete: () => {
-            gsap.set(this.DOM.miniGrid.el, {
-              opacity: 0,
-            });
-          },
+            from: -this.currentCell
         },
-        'start'
-      )
+        onComplete: () => {
+            gsap.set(this.DOM.miniGrid.el, {
+                opacity: 0
+            })
+        }
+    }, 'start')
 
-      .add(() => {
+    .add(() => {
         imageCell.contentItem.textReveal.out();
         imageCell.contentItem.textLinesReveal.out();
         this.DOM.content.classList.remove('content--open');
-      }, 'start')
-      .add(() =>
-        imageCell.contentItem.DOM.el.classList.remove('content__item--current')
-      )
-      .addLabel('showGrid', 0)
-      .set(
-        [imageCell.DOM.el, this.otherImageCells],
-        {
-          willChange: 'transform, opacity',
-        },
-        'showGrid'
-      )
-      .to(
-        imageCell.DOM.el,
-        {
-          scale: 1,
-          x: 0,
-          y: 0,
-          onComplete: () =>
-            gsap.set(imageCell.DOM.el, { willChange: '', zIndex: 1 }),
-        },
-        'showGrid'
-      )
-      .to(
-        imageCell.contentItem.DOM.nav.prev,
-        {
-          y: '-100%',
-        },
-        'showGrid'
-      )
-      .to(
-        imageCell.contentItem.DOM.nav.next,
-        {
-          y: '100%',
-        },
-        'showGrid'
-      )
-      .to(
-        this.otherImageCells,
-        {
-          opacity: 1,
-          scale: 1,
-          onComplete: () => {
-            gsap.set(this.otherImageCells, { willChange: '' });
+    }, 'start')
+    .add(() => imageCell.contentItem.DOM.el.classList.remove('content__item--current'))
+    .addLabel('showGrid', 0)
+    .set([imageCell.DOM.el, this.otherImageCells], {
+        willChange: 'transform, opacity'
+    }, 'showGrid')
+    .to(imageCell.DOM.el, {
+        scale: 1,
+        x: 0,
+        y: 0,
+        onComplete: () => gsap.set(imageCell.DOM.el, {willChange: '', zIndex: 1})
+    }, 'showGrid')
+    .to(imageCell.contentItem.DOM.nav.prev, {
+        y: '-100%'
+    }, 'showGrid')
+    .to(imageCell.contentItem.DOM.nav.next, {
+        y: '100%'
+    }, 'showGrid')
+    .to(this.otherImageCells, {
+        opacity: 1,
+        scale: 1,
+        onComplete: () => {
+            gsap.set(this.otherImageCells, {willChange: ''});
             gsap.set(this.DOM.el, { pointerEvents: 'auto' });
-          },
-          stagger: {
-            grid: auto,
-            amount: 0.17,
-            from: -this.currentCell,
-          },
         },
-        'showGrid'
-      )
-      .add(() => {
-        // show grid texts
+        stagger: {
+            grid: 'auto',
+            amount: 0.17,
+            from: -this.currentCell
+        }
+    }, 'showGrid')
+    .add(() => {
+        // Show grid texts
         this.textReveal.in();
-      }, 'showGrid+=0.3');
+    }, 'showGrid+=0.3')
   }
+  /**
+   *
+   */
   changeContent(position) {
     // Current imageCell
     const imageCell = this.imageCellArr[this.currentCell];
     // Upcoming imageCell
-    const upcominigImageCell = this.imageCellArr[position];
+    const upcomingImageCell = this.imageCellArr[position];
 
     this.DOM.miniGrid.cells[this.currentCell].classList.remove(
       'grid__cell--current'
@@ -422,91 +388,64 @@ export class Grid {
       'grid__cell--current'
     );
 
-    // Calculate the transform to appl to the image cell
+    // Calculate the transform to apply to the image cell
     const imageTransform = this.calcTransformImage();
     // prettier-ignore
     gsap.timeline({
         defaults: {
-          duration: 1,
-          ease: 'expo.inOut',
+            duration: 1, 
+            ease: 'expo.inOut'
         },
         onComplete: () => {
-          this.isAnimating = false;
-        },
-      })
-      .addLabel('start', 0)
-      .add(imageCell.contentItem.textReveal.out(), 'start')
-      .add(imageCell.contentItem.textLinesReveal.out(), 'start')
-      .add(() => {
+            this.isAnimating = false;
+        }
+    })
+    .addLabel('start', 0)
+    .add(imageCell.contentItem.textReveal.out(), 'start')
+    .add(imageCell.contentItem.textLinesReveal.out(), 'start')
+    .add(() => {
         imageCell.contentItem.DOM.el.classList.remove('content__item--current');
-      })
-      .set(
-        [imageCell.DOM.el, upcominigImageCell.DOM.el],
-        {
-          willChange: 'transform, opacity',
-        },
-        'start'
-      )
-      .to(
-        imageCell.DOM.el,
-        {
-          opacity: 0,
-          scale: 0.8,
-          x: 0,
-          y: 0,
-          onComplete: () =>
-            gsap.set(imageCell.DOM.el, { willChange: '', zIndex: 1 }),
-        },
-        'start'
-      )
-      .to(
-        imageCell.contentItem.DOM.nav.prev,
-        {
-          y: '100%',
-        },
-        'start'
-      )
-      .to(
-        imageCell.contentItem.DOM.nav.next,
-        {
-          y: '100%',
-        },
-        'start'
-      )
-      .to(
-        upcomingImageCell.DOM.el,
-        {
-          scale: imageTransform.scale,
-          x: imageTransform.x,
-          y: imageTransform.y,
-          opacity: 1,
-          onComplete: () =>
-            gsap.set(upcomingImageCell.DOM.el, { willChange: '' }),
-        },
-        'start'
-      )
-      .to(
-        [
-          upcomingImageCell.contentItem.DOM.nav.prev,
-          upcomingImageCell.contentItem.DOM.nav.next,
-        ],
-        {
-          ease: 'expo',
-          y: 0,
-        },
-        'showContent'
-      )
-      .add(() => {
+    })
+    .set([imageCell.DOM.el, upcomingImageCell.DOM.el], {
+        willChange: 'transform, opacity'
+    }, 'start')
+    .to(imageCell.DOM.el, {
+        opacity: 0,
+        scale: 0.8,
+        x: 0,
+        y: 0,
+        onComplete: () => gsap.set(imageCell.DOM.el, {willChange: '', zIndex: 1})
+    }, 'start')
+    .to(imageCell.contentItem.DOM.nav.prev, {
+        y: '-100%'
+    }, 'start')
+    .to(imageCell.contentItem.DOM.nav.next, {
+        y: '100%'
+    }, 'start')
+    
+    .addLabel('showContent', '>-=0.4')
+    .set(upcomingImageCell.DOM.el, {
+        zIndex: 100
+    }, 'start')
+    .to(upcomingImageCell.DOM.el, {
+        scale: imageTransform.scale,
+        x: imageTransform.x,
+        y: imageTransform.y,
+        opacity: 1,
+        onComplete: () => gsap.set(upcomingImageCell.DOM.el, {willChange: ''})
+    }, 'start')
+    .to([upcomingImageCell.contentItem.DOM.nav.prev, upcomingImageCell.contentItem.DOM.nav.next], {
+        ease: 'expo',
+        y: 0
+    }, 'showContent')
+    .add(() => {
         upcomingImageCell.contentItem.textReveal.in();
         upcomingImageCell.contentItem.textLinesReveal.in();
-      }, 'showContent')
-      .add(() => {
-        upcomingImageCell.contentItem.DOM.el.classList.add(
-          'content__item--current'
-        );
-      }, 'showContent+=0.02');
+    }, 'showContent')
+    .add(() => {
+        upcomingImageCell.contentItem.DOM.el.classList.add('content__item--current');
+    }, 'showContent+=0.02');
   }
-
   /**
    * Calculates the scale and translation values to apply to the image cell when we click on it.
    * Also used to recalculate those values on resize.

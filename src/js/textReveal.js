@@ -14,7 +14,6 @@ export class TextReveal {
     if (this.outTimeline && this.outTimeline.isActive()) {
       this.outTimeline.kill();
     }
-    // text coming in y:120%
     // prettier-ignore
     this.inTimeline = gsap.timeline({ defaults: { duration: 1.2, ease: 'expo' } })
       .set(this.DOM.inner, {
@@ -29,7 +28,6 @@ export class TextReveal {
     return this.inTimeline;
   }
   out() {
-    // text is going up y:-120%
     if (this.inTimeline && this.inTimeline.isActive()) {
       this.inTimeline.kill();
     }

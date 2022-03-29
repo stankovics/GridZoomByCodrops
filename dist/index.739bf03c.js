@@ -1054,16 +1054,18 @@ class Grid {
         );
         this.DOM.content = document.querySelector('.content');
         this.DOM.backCtrl = this.DOM.content.querySelector('.back');
-        this.DOM.miniGrid.el = this.DOM.content.querySelector('.grid-mini');
-        this.DOM.miniGrid.cells = this.DOM.content.querySelectorAll('.grid__cell');
+        this.DOM.miniGrid.el = this.DOM.content.querySelector('.grid--mini');
+        this.DOM.miniGrid.cells = [
+            ...this.DOM.miniGrid.el.querySelectorAll('.grid__cell'), 
+        ];
         // Text animations
         this.textReveal = new _textReveal.TextReveal([
             ...this.DOM.el.querySelectorAll('.oh')
         ]);
         // Events
         this.initEvents();
-    // Track wich cells are visible
-    // this.trackVisibleCells();
+    // Track which cells are visible
+    //this.trackVisibleCells();
     }
     /**
    * Track which cells are visible (inside the viewport)
@@ -1092,14 +1094,13 @@ class Grid {
      * */ for (const [position1, imageCell] of this.imageCellArr.entries()){
             // Open the imageCell and reveal its content
             imageCell.DOM.el.addEventListener('click', ()=>{
-                // creates click for each image on main grid
                 if (!this.isGridView || this.isAnimating) return false;
                 this.isAnimating = true;
                 this.isGridView = false;
                 // Update the mini grid current cell
                 if (this.currentCell !== -1) this.DOM.miniGrid.cells[this.currentCell].classList.remove('grid__cell--current');
                 // Update currentCell
-                this.currentCell = position1; // currentCell get value from postion, that is a returned key from this.imageCellArr.entries() from top.
+                this.currentCell = position1;
                 this.DOM.miniGrid.cells[this.currentCell].classList.add('grid__cell--current');
                 this.showContent(imageCell);
             });
@@ -1190,14 +1191,14 @@ class Grid {
                 duration: 1.2,
                 ease: 'expo.inOut'
             },
-            //overflow hidden
+            // overflow hidden
             onStart: ()=>bodyEl.classList.add('oh')
             ,
             onComplete: ()=>{
                 this.isAnimating = false;
             }
         }).addLabel('start', 0).add(()=>{
-            //hide grid texts
+            // Hide grid texts
             this.textReveal.out();
         }, 'start').set(this.DOM.el, {
             pointerEvents: 'none'
@@ -1215,12 +1216,17 @@ class Grid {
             y: imageTransform.y,
             onComplete: ()=>_gsap.gsap.set(imageCell.DOM.el, {
                     willChange: ''
-                }, 'start')
-        }).to(imageCell.DOM.inner, {
+                })
+        }, 'start').to(imageCell.DOM.inner, {
             scale: 1,
-            onComplete: ()=>_gsap.gsap.set(imageCell.inner, {
+            onComplete: ()=>_gsap.gsap.set(imageCell.DOM.inner, {
                     willChange: ''
                 })
+        }, 'start').to([
+            imageCell.contentItem.DOM.nav.prev,
+            imageCell.contentItem.DOM.nav.next
+        ], {
+            y: 0
         }, 'start').to(this.otherImageCells, {
             opacity: 0,
             scale: 0.8,
@@ -1229,7 +1235,7 @@ class Grid {
                 })
             ,
             stagger: {
-                grid: auto,
+                grid: 'auto',
                 amount: 0.17,
                 from: this.currentCell
             }
@@ -1253,7 +1259,7 @@ class Grid {
             },
             scale: 1,
             stagger: {
-                grid: auto,
+                grid: 'auto',
                 amount: 0.3,
                 from: this.currentCell
             }
@@ -1261,14 +1267,13 @@ class Grid {
             imageCell.contentItem.textReveal.in();
             imageCell.contentItem.textLinesReveal.in();
             this.DOM.content.classList.add('content--open');
-        }, 'showContent').add(()=>imageCell.contentItem.DOM.el.classList.add('content__item--curent')
+        }, 'showContent').add(()=>imageCell.contentItem.DOM.el.classList.add('content__item--current')
         , 'showContent+=0.02');
     }
     /**
-   * Scale down the image and reveal the grid again
-
+   * Scale down the image and reveal the grid again.
    */ closeContent() {
-        // Current image cell
+        // Current imageCell
         const imageCell = this.imageCellArr[this.currentCell];
         this.otherImageCells = this.DOM.imageCells.filter((el)=>el != imageCell.DOM.el
         );
@@ -1287,13 +1292,13 @@ class Grid {
         }).addLabel('start', 0).to(this.DOM.backCtrl, {
             x: '50%',
             opacity: 0
-        }, 'start').to(this.DOM.backCtrl, {
+        }, 'start').to(this.DOM.miniGrid.cells, {
             duration: 0.5,
             ease: 'expo.in',
             opacity: 0,
             scale: 0.8,
             stagger: {
-                grid: auto,
+                grid: 'auto',
                 amount: 0.1,
                 from: -this.currentCell
             },
@@ -1336,24 +1341,26 @@ class Grid {
                 });
             },
             stagger: {
-                grid: auto,
+                grid: 'auto',
                 amount: 0.17,
                 from: -this.currentCell
             }
         }, 'showGrid').add(()=>{
-            // show grid texts
+            // Show grid texts
             this.textReveal.in();
         }, 'showGrid+=0.3');
     }
-    changeContent(position) {
+    /**
+   *
+   */ changeContent(position) {
         // Current imageCell
         const imageCell = this.imageCellArr[this.currentCell];
         // Upcoming imageCell
-        const upcominigImageCell = this.imageCellArr[position];
+        const upcomingImageCell = this.imageCellArr[position];
         this.DOM.miniGrid.cells[this.currentCell].classList.remove('grid__cell--current');
         this.currentCell = position;
         this.DOM.miniGrid.cells[this.currentCell].classList.add('grid__cell--current');
-        // Calculate the transform to appl to the image cell
+        // Calculate the transform to apply to the image cell
         const imageTransform = this.calcTransformImage();
         // prettier-ignore
         _gsap.gsap.timeline({
@@ -1368,7 +1375,7 @@ class Grid {
             imageCell.contentItem.DOM.el.classList.remove('content__item--current');
         }).set([
             imageCell.DOM.el,
-            upcominigImageCell.DOM.el
+            upcomingImageCell.DOM.el
         ], {
             willChange: 'transform, opacity'
         }, 'start').to(imageCell.DOM.el, {
@@ -1381,9 +1388,11 @@ class Grid {
                     zIndex: 1
                 })
         }, 'start').to(imageCell.contentItem.DOM.nav.prev, {
-            y: '100%'
+            y: '-100%'
         }, 'start').to(imageCell.contentItem.DOM.nav.next, {
             y: '100%'
+        }, 'start').addLabel('showContent', '>-=0.4').set(upcomingImageCell.DOM.el, {
+            zIndex: 100
         }, 'start').to(upcomingImageCell.DOM.el, {
             scale: imageTransform.scale,
             x: imageTransform.x,
@@ -1394,7 +1403,7 @@ class Grid {
                 })
         }, 'start').to([
             upcomingImageCell.contentItem.DOM.nav.prev,
-            upcomingImageCell.contentItem.DOM.nav.next, 
+            upcomingImageCell.contentItem.DOM.nav.next
         ], {
             ease: 'expo',
             y: 0
@@ -1428,13 +1437,13 @@ parcelHelpers.export(exports, "ImageCell", ()=>ImageCell
  * ImageCell class represents an image cell (.grid__cell-img) / cells with pics on homepage grid.
  */ var _contentitem = require("./contentitem");
 class ImageCell {
-    //DOM Elements
+    // DOM elements
     DOM = {
-        //Main element (.grid__cell-img) /  image container
+        // Main element (.grid__cell-img)
         el: null,
-        // Inner element / pic inside image container/grid cell
+        // Inner element
         inner: null,
-        // The ImageCell's content item id
+        // The ImageCell's content item id.
         contentId: null,
         // The ContentItem instance
         contentItem: null
@@ -1445,9 +1454,9 @@ class ImageCell {
    */ constructor(DOM_el){
         this.DOM.el = DOM_el;
         this.DOM.inner = this.DOM.el.querySelector('.grid__cell-img-inner');
-        // The ImageCell's content idem id
+        // The ImageCell's content item id.
         this.contentId = this.DOM.inner.dataset.item;
-        // This ContentItem instance
+        // The ContentItem instance
         this.contentItem = new _contentitem.ContentItem(document.querySelector(`#${this.contentId}`));
     }
 }
@@ -1462,14 +1471,14 @@ parcelHelpers.export(exports, "ContentItem", ()=>ContentItem
  */ var _textReveal = require("./textReveal");
 var _textLinesReveal = require("./textLinesReveal");
 class ContentItem {
-    // DOM Elements
+    // DOM elements
     DOM = {
-        // Main element .content__item
+        // Main element (.content__item)
         el: null
     };
-    // TextReveal obj to animate the texts/ each word (slide in/out)
+    // TextReveal obj to animate the texts (slide in/out)
     textReveal = null;
-    // TextLinesReveal obj to animate the ,ulti line texts/ all text (slide in/out)
+    // TextLinesReveal obj to animate the ,ulti line texts (slide in/out)
     textLinesReveal = null;
     /**
    * Constructor.
@@ -1477,15 +1486,15 @@ class ContentItem {
    */ constructor(DOM_el){
         this.DOM.el = DOM_el;
         this.DOM.nav = {
-            prev: this.DOM.el.querySelecotr('.slide-nav__img--prev'),
+            prev: this.DOM.el.querySelector('.slide-nav__img--prev'),
             next: this.DOM.el.querySelector('.slide-nav__img--next')
         };
-        // Text Animations
+        // Text animations
         this.textReveal = new _textReveal.TextReveal([
-            ...this.DOM.el.querySelecotrAll('.oh')
+            ...this.DOM.el.querySelectorAll('.oh')
         ]);
         // Text lines animations
-        this.textLinesReveal = new _textLinesReveal.TextLinesReveal(this.DOM.el.querySelecotrAll('.content__item-text'));
+        this.textLinesReveal = new _textLinesReveal.TextLinesReveal(this.DOM.el.querySelector('.content__item-text'));
     }
 }
 
@@ -1506,7 +1515,6 @@ class TextReveal {
     }
     in() {
         if (this.outTimeline && this.outTimeline.isActive()) this.outTimeline.kill();
-        // text coming in y:120%
         // prettier-ignore
         this.inTimeline = _gsap.gsap.timeline({
             defaults: {
@@ -1524,7 +1532,6 @@ class TextReveal {
         return this.inTimeline;
     }
     out() {
-        // text is going up y:-120%
         if (this.inTimeline && this.inTimeline.isActive()) this.inTimeline.kill();
         // prettier-ignore
         this.outTimeline = _gsap.gsap.timeline({
