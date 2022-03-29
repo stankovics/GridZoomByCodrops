@@ -4,7 +4,7 @@
 There are some of my notes commented out in JS files.\
 <span>
 
-### <span style= "color:blue"> **Codrops articles and tutorials are great and professional. You will see in their JS/CSS code all new stuff implemented. Personally I love that they are using BEM convention in CSS, JS Classes, code packages, JS architecture for better organizing of code... :heart: :heart: :heart:**<span>
+### <span style= "color:blue"> ** This is great example of using gsap. Codrops articles and tutorials are great and professional. You will see in their JS/CSS code all new stuff implemented. Personally I love that they are using BEM convention in CSS, JS Classes, code packages, JS architecture for better organizing of code... :heart: :heart: :heart:**<span>
 
 A simple image grid layout where a small grid image zooms to become larger while a content view opens.
 
