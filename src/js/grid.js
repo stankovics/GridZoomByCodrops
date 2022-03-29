@@ -400,7 +400,105 @@ export class Grid {
         this.textReveal.in();
       }, 'showGrid+=0.3');
   }
-  changeContent(position) {}
+  changeContent(position) {
+    // Current imageCell
+    const imageCell = this.imageCellArr[this.currentCell];
+    // Upcoming imageCell
+    const upcominigImageCell = this.imageCellArr[position];
+
+    this.DOM.miniGrid.cells[this.currentCell].classList.remove(
+      'grid__cell--current'
+    );
+    this.currentCell = position;
+    this.DOM.miniGrid.cells[this.currentCell].classList.add(
+      'grid__cell--current'
+    );
+
+    // Calculate the transform to appl to the image cell
+    const imageTransform = this.calcTransformImage();
+
+    gsap
+      .timeline({
+        defaults: {
+          duration: 1,
+          ease: 'expo.inOut',
+        },
+        onComplete: () => {
+          this.isAnimating = false;
+        },
+      })
+      .addLabel('start', 0)
+      .add(imageCell.contentItem.textReveal.out(), 'start')
+      .add(imageCell.contentItem.textLinesReveal.out(), 'start')
+      .add(() => {
+        imageCell.contentItem.DOM.el.classList.remove('content__item--current');
+      })
+      .set(
+        [imageCell.DOM.el, upcominigImageCell.DOM.el],
+        {
+          willChange: 'transform, opacity',
+        },
+        'start'
+      )
+      .to(
+        imageCell.DOM.el,
+        {
+          opacity: 0,
+          scale: 0.8,
+          x: 0,
+          y: 0,
+          onComplete: () =>
+            gsap.set(imageCell.DOM.el, { willChange: '', zIndex: 1 }),
+        },
+        'start'
+      )
+      .to(
+        imageCell.contentItem.DOM.nav.prev,
+        {
+          y: '100%',
+        },
+        'start'
+      )
+      .to(
+        imageCell.contentItem.DOM.nav.next,
+        {
+          y: '100%',
+        },
+        'start'
+      )
+      .to(
+        upcomingImageCell.DOM.el,
+        {
+          scale: imageTransform.scale,
+          x: imageTransform.x,
+          y: imageTransform.y,
+          opacity: 1,
+          onComplete: () =>
+            gsap.set(upcomingImageCell.DOM.el, { willChange: '' }),
+        },
+        'start'
+      )
+      .to(
+        [
+          upcomingImageCell.contentItem.DOM.nav.prev,
+          upcomingImageCell.contentItem.DOM.nav.next,
+        ],
+        {
+          ease: 'expo',
+          y: 0,
+        },
+        'showContent'
+      )
+      .add(() => {
+        upcomingImageCell.contentItem.textReveal.in();
+        upcomingImageCell.contentItem.textLinesReveal.in();
+      }, 'showContent')
+      .add(() => {
+        upcomingImageCell.contentItem.DOM.el.classList.add(
+          'content__item--current'
+        );
+      }, 'showContent+=0.02');
+  }
 
   /**
    * Calculates the scale and translation values to apply to the image cell when we click on it.
