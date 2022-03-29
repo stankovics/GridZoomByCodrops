@@ -21,15 +21,15 @@ export class ContentItem {
   constructor(DOM_el) {
     this.DOM.el = DOM_el;
     this.DOM.nav = {
-      prev: this.DOM.el.querySelecotr('.slide-nav__img--prev'),
+      prev: this.DOM.el.querySelector('.slide-nav__img--prev'),
       next: this.DOM.el.querySelector('.slide-nav__img--next'),
     };
 
     // Text Animations
-    this.textReveal = new TextReveal([...this.DOM.el.querySelecotrAll('.oh')]);
+    this.textReveal = new TextReveal([...this.DOM.el.querySelectorAll('.oh')]);
     // Text lines animations
     this.textLinesReveal = new TextLinesReveal(
-      this.DOM.el.querySelecotrAll('.content__item-text')
+      this.DOM.el.querySelectorAll('.content__item-text')
     );
   }
 }
