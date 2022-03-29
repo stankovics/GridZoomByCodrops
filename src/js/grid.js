@@ -284,6 +284,123 @@ export class Grid {
         'showContent+=0.02'
       );
   }
+  /**
+   * Scale down the image and reveal the grid again
+
+   */
+  closeContent() {
+    // Current image cell
+    const imageCell = this.imageCellArr[this.currentCell];
+    this.otherImageCells = this.DOM.imageCells.filter(
+      el => el != imageCell.DOM.el
+    );
+
+    gsap
+      .timeline({
+        defaults: {
+          duration: 1,
+          ease: 'expo.inOut',
+        },
+        // overflow hidden
+        onStart: () => bodyEl.classList.remove('oh'),
+        onComplete: () => {
+          this.isAnimating = false;
+        },
+      })
+      .addLabel('start', 0)
+      .to(
+        this.DOM.backCtrl,
+        {
+          x: '50%',
+          opacity: 0,
+        },
+        'start'
+      )
+      .to(
+        this.DOM.backCtrl,
+        {
+          duration: 0.5,
+          ease: 'expo.in',
+          opacity: 0,
+          scale: 0.8,
+          stagger: {
+            grid: auto,
+            amount: 0.1,
+            from: -this.currentCell,
+          },
+          onComplete: () => {
+            gsap.set(this.DOM.miniGrid.el, {
+              opacity: 0,
+            });
+          },
+        },
+        'start'
+      )
+
+      .add(() => {
+        imageCell.contentItem.textReveal.out();
+        imageCell.contentItem.textLinesReveal.out();
+        this.DOM.content.classList.remove('content--open');
+      }, 'start')
+      .add(() =>
+        imageCell.contentItem.DOM.el.classList.remove('content__item--current')
+      )
+      .addLabel('showGrid', 0)
+      .set(
+        [imageCell.DOM.el, this.otherImageCells],
+        {
+          willChange: 'transform, opacity',
+        },
+        'showGrid'
+      )
+      .to(
+        imageCell.DOM.el,
+        {
+          scale: 1,
+          x: 0,
+          y: 0,
+          onComplete: () =>
+            gsap.set(imageCell.DOM.el, { willChange: '', zIndex: 1 }),
+        },
+        'showGrid'
+      )
+      .to(
+        imageCell.contentItem.DOM.nav.prev,
+        {
+          y: '-100%',
+        },
+        'showGrid'
+      )
+      .to(
+        imageCell.contentItem.DOM.nav.next,
+        {
+          y: '100%',
+        },
+        'showGrid'
+      )
+      .to(
+        this.otherImageCells,
+        {
+          opacity: 1,
+          scale: 1,
+          onComplete: () => {
+            gsap.set(this.otherImageCells, { willChange: '' });
+            gsap.set(this.DOM.el, { pointerEvents: 'auto' });
+          },
+          stagger: {
+            grid: auto,
+            amount: 0.17,
+            from: -this.currentCell,
+          },
+        },
+        'showGrid'
+      )
+      .add(() => {
+        // show grid texts
+        this.textReveal.in();
+      }, 'showGrid+=0.3');
+  }
+  changeContent(position) {}
 
   /**
    * Calculates the scale and translation values to apply to the image cell when we click on it.
