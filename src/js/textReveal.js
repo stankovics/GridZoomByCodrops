@@ -14,9 +14,8 @@ export class TextReveal {
     if (this.outTimeline && this.outTimeline.isActive()) {
       this.outTimeline.kill();
     }
-
-    this.inTimeline = gsap // text coming in y:120%
-      .timeline({ defaults: { duration: 1.2, ease: 'expo' } })
+    // prettier-ignore
+    this.inTimeline = gsap.timeline({ defaults: { duration: 1.2, ease: 'expo' } })
       .set(this.DOM.inner, {
         y: '120%',
         rotate: 15,
@@ -29,13 +28,11 @@ export class TextReveal {
     return this.inTimeline;
   }
   out() {
-    // text is going up y:-120%
     if (this.inTimeline && this.inTimeline.isActive()) {
       this.inTimeline.kill();
     }
-
-    this.outTimeline = gsap
-      .timeline({ defaults: { duration: 0.5, ease: 'expo.in' } })
+    // prettier-ignore
+    this.outTimeline = gsap.timeline({ defaults: { duration: 0.5, ease: 'expo.in' } })
       .to(this.DOM.inner, {
         y: '-120%',
         rotate: -5,

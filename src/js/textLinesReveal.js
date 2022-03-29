@@ -35,8 +35,8 @@ export class TextLinesReveal {
 
     // Animation
     gsap.killTweensOf(this.lines);
-    return gsap
-      .timeline({ defaults: { duration: 1.2, ease: 'expo' } })
+    // prettier-ignore
+    return gsap.timeline({ defaults: { duration: 1.2, ease: 'expo' } })
       .set(this.lines, {
         y: '150%',
         rotate: 15,
@@ -53,8 +53,8 @@ export class TextLinesReveal {
 
     // animation
     gsap.killTweensOf(this.lines);
-    return gsap
-      .timeline({
+    // prettier-ignore
+    return gsap.timeline({
         defaults: { duration: 0.5, ease: 'expo.in' },
       })
       .to(this.lines, {

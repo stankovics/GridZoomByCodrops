@@ -4,17 +4,18 @@
 import { ContentItem } from './contentitem';
 
 export class ImageCell {
-  //DOM Elements
+  // DOM elements
   DOM = {
-    //Main element (.grid__cell-img) /  image container
+    // Main element (.grid__cell-img)
     el: null,
-    // Inner element / pic inside image container/grid cell
+    // Inner element
     inner: null,
-    // The ImageCell's content item id
+    // The ImageCell's content item id.
     contentId: null,
     // The ContentItem instance
     contentItem: null,
   };
+
   /**
    * Constructor.
    * @param {Element} DOM_el - the .grid__cell-img element.
@@ -23,9 +24,9 @@ export class ImageCell {
     this.DOM.el = DOM_el;
     this.DOM.inner = this.DOM.el.querySelector('.grid__cell-img-inner');
 
-    // The ImageCell's content idem id
+    // The ImageCell's content item id.
     this.contentId = this.DOM.inner.dataset.item;
-    // This ContentItem instance
+    // The ContentItem instance
     this.contentItem = new ContentItem(
       document.querySelector(`#${this.contentId}`)
     );
