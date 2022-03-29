@@ -127,18 +127,27 @@ export class Grid {
           return false;
         }
         gsap.killTweensOf([imageCell.DOM.el, imageCell.DOM.inner]);
-        gsap
-          .timeline({
-            defaults: {
-              duration: 2.4,
-              ease: 'expo',
-            },
+        // prettier-ignore
+        gsap.timeline({
+            defaults: { duration: 2.4, ease: 'expo' },
           })
           .to(imageCell.DOM.el, { scale: 0.95 }, 0)
           .to(imageCell.DOM.inner, { scale: 1.4 }, 0);
       });
-    }
 
+      // Hovering out will reverse the scale values.
+      imageCell.DOM.el.addEventListener('mouseleave', () => {
+        if (!this.isGridView) {
+          return false;
+        }
+        gsap.killTweensOf([imageCell.DOM.el, imageCell.DOM.inner]);
+        // prettier-ignore
+        gsap.timeline({
+            defaults: { duration: 2.4, ease: 'expo' },
+          })
+          .to([imageCell.DOM.el, imageCell.DOM.inner], { scale: 1 }, 0);
+      });
+    }
     // Close the imageCell and reveal the grid
     this.DOM.backCtrl.addEventListener('click', () => {
       if (this.isAnimating) {
@@ -190,8 +199,8 @@ export class Grid {
       imageCell.DOM.inner,
       this.otherImageCells,
     ]);
-    gsap
-      .timeline({
+    // prettier-ignore
+    gsap.timeline({
         defaults: {
           duration: 1.2,
           ease: 'expo.inOut',
@@ -294,9 +303,8 @@ export class Grid {
     this.otherImageCells = this.DOM.imageCells.filter(
       el => el != imageCell.DOM.el
     );
-
-    gsap
-      .timeline({
+    // prettier-ignore
+    gsap.timeline({
         defaults: {
           duration: 1,
           ease: 'expo.inOut',
@@ -416,9 +424,8 @@ export class Grid {
 
     // Calculate the transform to appl to the image cell
     const imageTransform = this.calcTransformImage();
-
-    gsap
-      .timeline({
+    // prettier-ignore
+    gsap.timeline({
         defaults: {
           duration: 1,
           ease: 'expo.inOut',
